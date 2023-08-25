@@ -25,7 +25,7 @@ class MangaDownloader:
     @staticmethod
     def get_chapter_number(chapter):
         """
-        :rtype: int
+        :rtype: int or str
         :param str chapter:
         """
         raise NotImplementedError
@@ -57,12 +57,12 @@ class MangaDownloader:
 
             filename = os.path.join(TMP_FILE, title, chapter_list[i].text + '.pdf')
             filename_tmp = os.path.join(TMP_FILE, 'tmp', title, chapter_list[i].text + '.pdf')
-            chapter_done.append(filename)
-            n_chapter_done.append(n_chap)
 
             if not os.path.isfile(filename):
                 if not os.path.isfile(filename_tmp):
                     img = self.get_chapter(chapter_list[i].attrib['href'])
+                    if not img:
+                        continue
                     img[0].save(filename_tmp, "PDF", title=chapter_list[i].text, save_all=True, append_images=img[1:])
 
                 if not subprocess.run(
@@ -72,6 +72,9 @@ class MangaDownloader:
                     os.remove(filename_tmp)
                 else:
                     exit()
+
+            chapter_done.append(filename)
+            n_chapter_done.append(n_chap)
 
         if bounds:
             title = '{0} {1}-{2}'.format(title, *bounds)
